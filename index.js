@@ -48,30 +48,56 @@ const MCFormColorToRGB = (MCFR, MCFG, MCFB) => {
     return [r, g, b];
 }
 
-// Использование функции
-const normalizedColor = [1, 0.588, 0]; // Пример RGB в MCF цвета
-const rgbColor = MCFormColorToRGB(normalizedColor[0], normalizedColor[1], normalizedColor[2]);
-console.log('RGB цвет:', rgbColor);
-
-
 const rl = readline.createInterface({
     input: process.stdin,   // входной поток как стандартный ввод
     output: process.stdout  // выходной поток как стандартный вывод
 });
 
-rl.question('Введите цвет в формате RGB (например, 255, 150, 0): ', (input) => {
-    // Разбивка введенную строку на массив, разделенный запятой, и преобразуем его в числа
-    const rgbArray = input.split(',').map(Number);
 
-    // Проверка того, что введены 3 числа и они являются числами собстна
-    if (rgbArray.length !== 3 || isNaN(rgbArray[0]) || isNaN(rgbArray[1]) || isNaN(rgbArray[2])) {
-        console.log('Неверный формат ввода. Пожалуйста, введите цвет в формате "R, G, B".');
-    } else {
-        // Если введенные значения корректны, вызов функции RGBtoMCFormColor для преобразования
-        const normalizedColor = RGBtoMCFormColor(rgbArray[0], rgbArray[1], rgbArray[2]);
-        console.log('Нормализованный цвет:', normalizedColor);
-    }
+/**
+ * Функция отображает главное меню для выбора действий и обрабатывает ввод.
+ * Можно выбрать преобразование из RGB в Minecraft Form (0) или из Minecraft Form в RGB (1).
+ * После каждого выполненного преобразования возврат в главное меню.
+ * Для выхода из программы можно использовать Ctrl+C.
+ */
+function mainMenu() {
+    console.log('Выбери действие тупа:');
+    console.log('0 = Преобразовать из RGB в Minecraft Form');
+    console.log('1 = Преобразовать из Minecraft Form в RGB');
+    console.log('Для выхода нажми Ctrl+C');
 
-    // Закрытие интерфейса ввода-вывода после завершения
-    rl.close();
-});
+    rl.question('Введи номер действия: ', (choice) => {
+        if (choice === '0') {
+            rl.question('Введи цвет в формате RGB (например, 255, 150, 0): ', (input) => {
+                const rgbArray = input.split(',').map(Number);
+
+                if (rgbArray.length !== 3 || isNaN(rgbArray[0]) || isNaN(rgbArray[1]) || isNaN(rgbArray[2])) {
+                    console.log('Неверный формат ввода. Введи цвет в формате "R, G, B".');
+                } else {
+                    const MCFColor = RGBtoMCFormColor(rgbArray[0], rgbArray[1], rgbArray[2]);
+                    console.log('Преобразованный цвет:', MCFColor);
+                }
+
+                mainMenu();
+            });
+        } else if (choice === '1') {
+            rl.question('Введи Minecraft Form цвет (например, 1.000, 0.588, 0.000): ', (input) => {
+                const mcfArray = input.split(',').map(Number);
+
+                if (mcfArray.length !== 3 || isNaN(mcfArray[0]) || isNaN(mcfArray[1]) || isNaN(mcfArray[2])) {
+                    console.log('Неверный формат ввода. Введи цвет в формате "MCFR, MCFG, MCFB".');
+                } else {
+                    const rgbColor = MCFormColorToRGB(mcfArray[0], mcfArray[1], mcfArray[2]);
+                    console.log('RGB цвет:', rgbColor);
+                }
+
+                mainMenu();
+            });
+        } else {
+            console.log('Неверный выбор. Выбери 0 или 1.');
+            mainMenu();
+        }
+    });
+}
+
+mainMenu();
